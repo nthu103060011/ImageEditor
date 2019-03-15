@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Microsoft.Win32;
+using System.IO;
 
 namespace ImageEditor
 {
@@ -23,6 +25,24 @@ namespace ImageEditor
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog();
+            fileDialog.Filter = "Image Files|*.png";
+            if (fileDialog.ShowDialog() == true)
+            {
+                RenderTargetBitmap bmp = new RenderTargetBitmap((int)InkCanvas.ActualWidth, (int)InkCanvas.ActualHeight, 96, 96, PixelFormats.Pbgra32);
+                bmp.Render(InkCanvas);
+
+                PngBitmapEncoder encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(bmp));
+
+                encoder.Save(new FileStream(fileDialog.FileName, FileMode.Create));
+
+                MessageBox.Show("Image Saved", "Message");
+            }
         }
     }
 }
